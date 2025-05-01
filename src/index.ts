@@ -1,30 +1,20 @@
 #!/usr/bin/env node
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { z } from "zod";
 import axios from "axios";
 import * as cheerio from "cheerio";
 import express, { Request, Response } from "express";
-import { randomUUID } from "crypto";
-import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 
-const server = new McpServer({
-  name: "web-search",
-  version: "0.1.0",
-});
+// HTTP 서버 및 MCP Streamable HTTP Transport 세션 관리
+const app = express();
+app.use(express.json());
 
-server.tool(
-  "search",
-  {
-    query: z.string().describe("Search query"),
-    limit: z
-      .number()
-      .min(1)
-      .max(10)
-      .optional()
-      .describe("Maximum number of results to return (default: 5)"),
-  },
-  async ({ query, limit }: { query: string; limit?: number }) => {
+app.post("/mcp", async (req: Request, res: Response) => {
+  const google_search = async ({
+    query,
+    limit,
+  }: {
+    query: string;
+    limit?: number;
+  }) => {
     try {
       const response = await axios.get("https://www.google.com/search", {
         params: { q: query },
@@ -77,50 +67,25 @@ server.tool(
         isError: true,
       };
     }
-  }
-);
-
-// HTTP 서버 및 MCP Streamable HTTP Transport 세션 관리
-const app = express();
-app.use(express.json());
-
-const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
-
-app.post("/mcp", async (req: Request, res: Response) => {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
-  let transport: StreamableHTTPServerTransport;
-
-  if (sessionId && transports[sessionId]) {
-    // 기존 세션 재사용
-    transport = transports[sessionId];
-  } else if (!sessionId && isInitializeRequest(req.body)) {
-    // 새로운 세션 생성
-    transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-      onsessioninitialized: (sid) => {
-        transports[sid] = transport;
-      },
-    });
-    // 세션 종료 시 정리
-    transport.onclose = () => {
-      if (transport.sessionId) {
-        delete transports[transport.sessionId];
-      }
-    };
-    await server.connect(transport);
-  } else {
+  };
+  const searchRes = await google_search({ query: req.params.query });
+  if (searchRes.isError) {
     res.status(400).json({
       jsonrpc: "2.0",
       error: {
         code: -32000,
         message: "Bad Request: No valid session ID provided",
       },
-      id: null,
+    });
+    return;
+  } else {
+    res.status(200).json({
+      jsonrpc: "2.0",
+      error: null,
+      data: searchRes.content,
     });
     return;
   }
-
-  await transport.handleRequest(req, res, req.body);
 });
 
 // GET /mcp는 SSE 스트림 미지원(405)
