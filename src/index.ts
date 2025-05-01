@@ -6,7 +6,7 @@ import express, { Request, Response } from "express";
 const app = express();
 app.use(express.json());
 
-app.post("/", async (req: Request, res: Response) => {
+app.post("/mcp", async (req: Request, res: Response) => {
   const google_search = async ({
     query,
     limit,
@@ -88,7 +88,7 @@ app.post("/", async (req: Request, res: Response) => {
 });
 
 // GET /mcp는 SSE 스트림 미지원(405)
-app.get("/", (req: Request, res: Response) => {
+app.get("/mcp", (req: Request, res: Response) => {
   res.status(405).send("Method Not Allowed");
 });
 
