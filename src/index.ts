@@ -3,11 +3,10 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 import express, { Request, Response } from "express";
 
-// HTTP 서버 및 MCP Streamable HTTP Transport 세션 관리
 const app = express();
 app.use(express.json());
 
-app.post("/mcp", async (req: Request, res: Response) => {
+app.post("/", async (req: Request, res: Response) => {
   const google_search = async ({
     query,
     limit,
@@ -89,7 +88,7 @@ app.post("/mcp", async (req: Request, res: Response) => {
 });
 
 // GET /mcp는 SSE 스트림 미지원(405)
-app.get("/mcp", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.status(405).send("Method Not Allowed");
 });
 
