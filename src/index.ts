@@ -48,21 +48,6 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
   }
 }
 
-app.get("/mcp", async (req: Request, res: Response): Promise<void> => {
-  try {
-    const query = req.query.query as string;
-    if (!query) {
-      res.status(400).json({ error: 'Query parameter "query" is required' });
-      return;
-    }
-
-    const items = await searchDuckDuckGo(query);
-    res.json({ items });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 app.post("/mcp", async (req: Request, res: Response): Promise<void> => {
   try {
     const query = req.body.query as string;
