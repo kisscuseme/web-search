@@ -48,7 +48,7 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
   }
 }
 
-app.post("/mcp", async (req: Request, res: Response): Promise<void> => {
+app.post("/", async (req: Request, res: Response): Promise<void> => {
   try {
     const query = req.body.query.input as string;
     if (!query) {
