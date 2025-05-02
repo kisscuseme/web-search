@@ -49,11 +49,12 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
   }
 }
 
-app.get("/mcp", async (req: Request, res: Response) => {
+app.get("/mcp", async (req: Request, res: Response): Promise<void> => {
   try {
     const query = req.query.q as string;
     if (!query) {
-      return res.status(400).json({ error: 'Query parameter "q" is required' });
+      res.status(400).json({ error: 'Query parameter "q" is required' });
+      return;
     }
 
     const results = await searchDuckDuckGo(query);
