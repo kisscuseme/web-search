@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 
 app.post("/mcp", async (req: Request, res: Response) => {
-  const google_search = async ({
+  const duckduckgo_search = async ({
     query,
     limit,
   }: {
@@ -15,7 +15,7 @@ app.post("/mcp", async (req: Request, res: Response) => {
     limit?: number;
   }) => {
     try {
-      const response = await axios.get("https://www.google.com/search", {
+      const response = await axios.get("https://html.duckduckgo.com/html/", {
         params: { q: query },
         headers: {
           "User-Agent":
@@ -27,11 +27,11 @@ app.post("/mcp", async (req: Request, res: Response) => {
       const results: { title: string; url: string; description: string }[] = [];
       const max = Math.min(limit ?? 5, 10);
 
-      $("div.g").each((i, element) => {
+      $(".result").each((i, element) => {
         if (i >= max) return false;
-        const titleElement = $(element).find("h3");
-        const linkElement = $(element).find("a");
-        const snippetElement = $(element).find(".VwiC3b");
+        const titleElement = $(element).find(".result__title");
+        const linkElement = $(element).find(".result__title a");
+        const snippetElement = $(element).find(".result__snippet");
         const url = linkElement.attr("href");
         if (
           titleElement.length &&
@@ -40,9 +40,9 @@ app.post("/mcp", async (req: Request, res: Response) => {
           url.startsWith("http")
         ) {
           results.push({
-            title: titleElement.text(),
+            title: titleElement.text().trim(),
             url,
-            description: snippetElement.text() || "",
+            description: snippetElement.text().trim() || "",
           });
         }
       });
@@ -67,7 +67,7 @@ app.post("/mcp", async (req: Request, res: Response) => {
       };
     }
   };
-  const searchRes = await google_search({ query: req.params.query });
+  const searchRes = await duckduckgo_search({ query: req.params.query });
   if (searchRes.isError) {
     res.status(400).json({
       jsonrpc: "2.0",
