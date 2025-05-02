@@ -44,7 +44,6 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
 
     return items;
   } catch (error) {
-    console.error("Error searching DuckDuckGo:", error);
     throw error;
   }
 }
@@ -64,6 +63,18 @@ app.get("/mcp", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`DuckDuckGo MCP server is running on port ${port}`);
+app.post("/mcp", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const query = req.body.query as string;
+    if (!query) {
+      res.status(400).json({ error: 'Body parameter "query" is required' });
+      return;
+    }
+    const items = await searchDuckDuckGo(query);
+    res.json({ items });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
+
+app.listen(port);
