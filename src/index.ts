@@ -57,7 +57,7 @@ app.get("/mcp", async (req: Request, res: Response) => {
     }
 
     const results = await searchDuckDuckGo(query);
-    res.json({ results });
+    res.json(results);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
