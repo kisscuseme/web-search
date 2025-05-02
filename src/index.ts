@@ -26,7 +26,7 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
     );
 
     const root = parse(response.data);
-    const results: SearchResult[] = [];
+    const items: SearchResult[] = [];
 
     root.querySelectorAll(".result").forEach((result: HTMLElement) => {
       const titleElement = result.querySelector(".result__title");
@@ -34,7 +34,7 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
       const linkElement = result.querySelector(".result__url");
 
       if (titleElement && snippetElement && linkElement) {
-        results.push({
+        items.push({
           title: titleElement.text.trim(),
           link: linkElement.text.trim(),
           snippet: snippetElement.text.trim(),
@@ -42,7 +42,7 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
       }
     });
 
-    return results;
+    return items;
   } catch (error) {
     console.error("Error searching DuckDuckGo:", error);
     throw error;
@@ -51,14 +51,14 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
 
 app.get("/mcp", async (req: Request, res: Response): Promise<void> => {
   try {
-    const query = req.query.q as string;
+    const query = req.query.query as string;
     if (!query) {
-      res.status(400).json({ error: 'Query parameter "q" is required' });
+      res.status(400).json({ error: 'Query parameter "query" is required' });
       return;
     }
 
-    const results = await searchDuckDuckGo(query);
-    res.json(results);
+    const items = await searchDuckDuckGo(query);
+    res.json({ items });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
