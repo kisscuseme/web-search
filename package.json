@@ -4,9 +4,9 @@
   "description": "DuckDuckGo MCP Server in TypeScript",
   "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node src/duckduckgo/index.ts",
+    "start": "node build/index.js",
     "build": "tsc",
-    "dev": "nodemon src/duckduckgo/index.ts"
+    "dev": "nodemon src/index.ts"
   },
   "dependencies": {
     "express": "^4.18.2",
