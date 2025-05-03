@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, response, Response } from "express";
 import axios from "axios";
 import { parse, HTMLElement } from "node-html-parser";
 
@@ -56,7 +56,7 @@ app.post("/", async (req: Request, res: Response): Promise<void> => {
       return;
     }
     const items = await searchDuckDuckGo(query);
-    res.json(items);
+    res.json({ data: JSON.stringify(items) });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
