@@ -56,7 +56,14 @@ app.post("/", async (req: Request, res: Response): Promise<void> => {
       return;
     }
     const items = await searchDuckDuckGo(query);
-    res.json(JSON.stringify(items));
+    res.status(200).json({
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(items, null, 2),
+        },
+      ],
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
