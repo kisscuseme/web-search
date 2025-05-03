@@ -64,22 +64,4 @@ app.post("/", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.get("/mcp", async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { query } = req.query;
-
-    if (!query) {
-      res.status(400).json({ error: "Body parameter is required" });
-      return;
-    }
-
-    const items = await searchDuckDuckGo(query as string);
-    res.status(200).json({
-      data: JSON.stringify(items, null, 2),
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 app.listen(port);
