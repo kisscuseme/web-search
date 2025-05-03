@@ -50,7 +50,7 @@ async function searchDuckDuckGo(query: string): Promise<SearchResult[]> {
 
 app.post("/", async (req: Request, res: Response): Promise<void> => {
   try {
-    const query = req.body.query.input as string;
+    const query = req.body.query as string;
     if (!query) {
       res.status(400).json({ error: "Body parameter is required" });
       return;
