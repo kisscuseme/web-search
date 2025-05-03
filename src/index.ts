@@ -64,4 +64,31 @@ app.post("/", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+app.post("/mcp", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { jsonrpc, id, method, params } = req.body;
+
+    if (!params.query) {
+      res.status(400).json({ error: "Body parameter is required" });
+      return;
+    }
+
+    if (method != "search") {
+      res.status(400).json({ error: "Method not found" });
+      return;
+    }
+
+    const items = await searchDuckDuckGo(params.query);
+    res.status(200).json({
+      jsonrpc,
+      id,
+      result: {
+        data: JSON.stringify(items, null, 2),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.listen(port);
